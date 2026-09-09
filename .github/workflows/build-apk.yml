@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-apk:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,7 +17,7 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -25,14 +25,19 @@ jobs:
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
-      - name: Create APK
+      - name: Create Bubblewrap project
         run: |
-          bubblewrap init --manifest ./manifest.json
-          bubblewrap build
+          mkdir -p twa
+          cd twa
+          bubblewrap init --manifest https://sparkling-biscochitos-e43888.netlify.app/manifest.json
+
+      - name: Build APK
+        run: |
+          cd twa
+          bubblewrap build --skipPwaValidation
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Ranked-Draft-Simulator-APK
-          path: |
-            **/*.apk
+          path: twa/app-release-signed.apk
