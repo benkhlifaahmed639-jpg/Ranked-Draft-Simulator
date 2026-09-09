@@ -4,26 +4,31 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-apk:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download repository
+      - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'
 
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
-      - name: Build APK
+      - name: Create APK
         run: |
-          bubblewrap init --manifest https://raw.githubusercontent.com/${{ github.repository }}/main/manifest.json
-          yes "" | bubblewrap update
-          bubblewrap build --skipPwaValidation
+          bubblewrap init --manifest ./manifest.json
+          bubblewrap build
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
